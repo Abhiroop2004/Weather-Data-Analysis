@@ -1,38 +1,86 @@
-import mysql.connector, os
-from dotenv import load_dotenv
-
-def monthly_temp(aggregator='avg', attribute='Temperature', monthNo=1, year=None):
-    cursorObject = cnx.cursor()
-    query= f'''select {aggregator}({attribute}) from weather where Month(`Date time`)={monthNo}'''
-    if year is not None :
-        query+=  f''' and year(`Date time`)={year}'''
-    query+= ';'
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    return round(result[0][0], 2)
+def dynamic( day = 1, monthNo = 1, cursorObject = None, dataframe = None):
+    tail = f''' from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo};'''
     
-def monthly_rainy_day_count(monthNo=1):
-    cursorObject = cnx.cursor()
-    query= f''' select avg(days) from(select count(*) as days from weather where Month(`Date time`)={monthNo} and Precipitation>0 group by Year(`Date time`)) as alias;'''
+    query= f'''select avg(`Maximum Temperature`)''' + tail
     cursorObject.execute(query)
     result = cursorObject.fetchall()
-    return round(result[0][0], 2)
+    #print("\nhhh  ",result[0][0])
+    dataframe['Average Max Temp'] = result[0]
 
-def dynamic(aggregator='avg', attribute='Temperature', day=1, monthNo=None):
-    cursorObject = cnx.cursor()
-    query= f'''select {aggregator}(`{attribute}`) from weather where Day(`Date time`)={day}'''
-    if monthNo is not None :
-        query+=  f''' and Month(`Date time`)={monthNo}'''
-    query+= ';'
+    query= f'''select avg(`Minimum Temperature`)''' + tail
     cursorObject.execute(query)
     result = cursorObject.fetchall()
-    return round(result[0][0], 2)
+    dataframe['Average Min Temp'] = round(result[0][0], 2)
 
-load_dotenv()
-mysql_password = os.getenv('mysql_password')
+    query = f'''select max(`Maximum Temperature`)''' + tail
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    dataframe['Max Recorded Temp'] = round(result[0][0], 2)
 
-cnx = mysql.connector.connect(user ='root', password=mysql_password, host='localhost', database='kolkata_weather')
-print(monthly_temp(attribute='Precipitation', monthNo='6'), 'units')
-print(monthly_rainy_day_count(6), 'days')
-print(dynamic(aggregator='max', monthNo=4), 'units')
-cnx.close()
+    query = f'''select min(`Minimum Temperature`)''' + tail
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    dataframe['Min Recorded Temp'] = round(result[0][0], 2)
+
+    query = f'''select avg(`Precipitation`)''' + tail
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    dataframe['Average Rainfall'] = round(result[0][0], 2)
+
+    query = f'''select max(`Precipitation`)''' + tail
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    dataframe['Max Rainfall'] = float(round(result[0][0], 2))
+    return dataframe
+    query = f'''select count(*) from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo} group by Conditions'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    #dataframe['Conditions Summary'] = result
+
+    
+    #return round(result[0][0], 2)
+
+def static_table(cursorObject = None, dataframe = None):
+    query = '''select min(`Minimum Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(min(result))
+    dataframe['Min. Recorded Temperature']= result
+
+    query = '''select avg(`Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(round(sum(result)/len(result),2))
+    dataframe['Average Temperature'] = result
+
+    query = '''select max(`Maximum Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(max(result))
+    dataframe['Max. Recorded Temperature'] = result
+
+    query = '''select sum(`Precipitation`)/6 from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(sum(result))
+    dataframe['Average Rainfall'] = result
+
+    query = '''select count(*)/6 from weather where Precipitation>0 group by Month(`Date time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(sum(result))
+    dataframe['Average Rainy Days']= result
+
+    query = '''select avg(`Relative Humidity`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    result = cursorObject.fetchall()
+    result = [round(temp[0],2) for temp in result]
+    result.append(round(sum(result)/len(result),2))
+    dataframe['Average Rel. Humidity'] = result
+
+    return dataframe
