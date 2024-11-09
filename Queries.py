@@ -1,86 +1,85 @@
-def dynamic( day = 1, monthNo = 1, cursorObject = None, dataframe = None):
+import pandas
+
+def dynamic(cursorObject, day, monthNo):
+    queryList = []
+    response = []
     tail = f''' from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo};'''
     
-    query= f'''select avg(`Maximum Temperature`)''' + tail
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    #print("\nhhh  ",result[0][0])
-    dataframe['Average Max Temp'] = result[0]
+    queryList.append("select avg(`Maximum Temperature`)")
+    queryList.append("select avg(`Minimum Temperature`)")
+    queryList.append("select max(`Maximum Temperature`)")
+    queryList.append("select min(`Minimum Temperature`)")
+    queryList.append("select avg(`Precipitation`)")
+    queryList.append("select max(`Precipitation`)")
 
-    query= f'''select avg(`Minimum Temperature`)''' + tail
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    dataframe['Average Min Temp'] = round(result[0][0], 2)
+    for query in queryList:
+        cursorObject.execute(query+tail)
+        response.append(round(cursorObject.fetchall()[0][0],2))
 
-    query = f'''select max(`Maximum Temperature`)''' + tail
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    dataframe['Max Recorded Temp'] = round(result[0][0], 2)
+    response = pandas.DataFrame(response, columns=[''], index= ['Average Max Temp', 'Average Min Temp', 'Max Recorded Temp', 'Min Recorded Temp', 'Average Rainfall', 'Max Rainfall'])#, 'Conditions Summary'])
+    return response
 
-    query = f'''select min(`Minimum Temperature`)''' + tail
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    dataframe['Min Recorded Temp'] = round(result[0][0], 2)
+def conditions_summary(cursorObject, day, monthNo):
+    df= pandas.DataFrame(index=[''])
 
-    query = f'''select avg(`Precipitation`)''' + tail
+    query = f'''select Conditions, count(Conditions) from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo} group by Conditions'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    dataframe['Average Rainfall'] = round(result[0][0], 2)
+    response = cursorObject.fetchall()
 
-    query = f'''select max(`Precipitation`)''' + tail
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    dataframe['Max Rainfall'] = float(round(result[0][0], 2))
-    return dataframe
-    query = f'''select count(*) from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo} group by Conditions'''
-    cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    #dataframe['Conditions Summary'] = result
+    for condition in ['Clear', 'Partially cloudy', 'Rain', 'Overcast']:
+        sum =0
+        for label in response:
+            if condition in label[0]:
+                sum+= label[1]
+        if sum:
+            df[condition] = [f"{sum} out of last 6 years "]
+        
+    return df
 
     
-    #return round(result[0][0], 2)
+def static_table(cursorObject):
+    dataframe = pandas.DataFrame(index= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Year'])
 
-def static_table(cursorObject = None, dataframe = None):
     query = '''select min(`Minimum Temperature`) from weather group by month(`Date Time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(min(result))
-    dataframe['Min. Recorded Temperature']= result
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(min(response))
+    dataframe['Min. Recorded Temperature'] =response
 
     query = '''select avg(`Temperature`) from weather group by month(`Date Time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(round(sum(result)/len(result),2))
-    dataframe['Average Temperature'] = result
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response)/len(response))
+    dataframe['Average Temperature'] =response
 
     query = '''select max(`Maximum Temperature`) from weather group by month(`Date Time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(max(result))
-    dataframe['Max. Recorded Temperature'] = result
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(max(response))
+    dataframe['Max. Recorded Temperature'] =response
 
     query = '''select sum(`Precipitation`)/6 from weather group by month(`Date Time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(sum(result))
-    dataframe['Average Rainfall'] = result
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response))
+    dataframe['Average Rainfall'] =response
 
     query = '''select count(*)/6 from weather where Precipitation>0 group by Month(`Date time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(sum(result))
-    dataframe['Average Rainy Days']= result
+    response = cursorObject.fetchall()
+    response = [float(temp[0]) for temp in response]
+    response.append(sum(response))
+    dataframe['Average Rainy Days'] =response
 
     query = '''select avg(`Relative Humidity`) from weather group by month(`Date Time`);'''
     cursorObject.execute(query)
-    result = cursorObject.fetchall()
-    result = [round(temp[0],2) for temp in result]
-    result.append(round(sum(result)/len(result),2))
-    dataframe['Average Rel. Humidity'] = result
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response)/len(response))
+    dataframe['Average Rel. Humidity'] =response
 
     return dataframe
