@@ -14,7 +14,7 @@ def edit_background(file_path, bg, secondary_bg, text):
 
     print("Background color updated successfully!")
 
-cnx = mysql.connector.connect(user ='root', password='12345', host='localhost', database='kolkata_weather')
+cnx = mysql.connector.connect(user ='root', password='12345678', host='localhost', database='kolkata_weather')
 cursor = cnx.cursor()
 current_time = datetime.now()
 hour = current_time.hour
@@ -29,7 +29,7 @@ else:
 def main():
     st.set_page_config(layout="wide")
     st.title(f"Weather Data Analysis{emoji}")    
-    print(current_time.date)
+    # print(current_time.date)
     navigation_options = ["Home", "Info"]
     menu_selection = st.selectbox("",navigation_options)
     
@@ -40,21 +40,32 @@ def main():
 
 def show_home():
     st.write("### Climate data for Kolkata from 2017 to 2022")
-    dataframe1 = pandas.DataFrame(index = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Year'])
-    table = Q.static_table(cursorObject = cursor, dataframe = dataframe1)
+    table = Q.static_table(cursor)
     st.table(data = table.T.style.format("{:.2f}"))
-    dataframe2 = pandas.DataFrame(columns = ['Average Max Temp', 'Average Min Temp', 'Max Recorded Temp', 'Min Recorded Temp', 'Average Rainfall', 'Max Rainfall', 'Conditions Summary'])
-    table2 = Q.dynamic(day=current_time.day, monthNo = current_time.month, cursorObject = cursor, dataframe = dataframe2)
-    st.write(f"### Historic Data for {current_time.date()}")
+    table2 = Q.dynamic(cursor, day=current_time.day, monthNo = current_time.month)
+    st.write(f"### Historic Data for {current_time.date().strftime('%d %B')}")
+    column1, column2 = st.columns(2)
     #table2 = table2.T.rename(columns = {'0':'Values'}, inplace=True)
-    table3 = table2.T.rename(columns = {0:'Values'})
+    # table3 = table2.rename(columns = {'':'Values'})
     #table3.index.name = ['Info']
-    st.table(data = table3.style.format("{:.2f}"))
+    with column1:
+        st.dataframe(table2)
+    # st.table(data = table3.style.format("{:.2f}"))
+    with column2:
+        st.dataframe(Q.conditions_summary(cursor, current_time.day, monthNo = current_time.month).T)
 
 def show_info():
     st.write("# Info")
     st.write("- ### [Abhiroop's LinkedIn](https://linkedin.com/in/abhiroop2004)")
     st.write("- ### [Snehal's LinkedIn](https://www.linkedin.com/in/snehal-ghosh-164a63263)")
+    st.write()
+    st.write('''Project developed under the guidance of Professor Doctor DeepShubhra Guha Roy
+             for the Database Management Systems Laboratory
+             being taught by the department of Computer Science and Engineering
+             (Artificial Intelligence and Machine Learning) along with 
+             Computer Science and Business Studies headed by 
+             Professor Amartya Mukherjee at the
+             Institute of Engineering and Management SaltLake''')
 
 if __name__ == "__main__":
     main()
