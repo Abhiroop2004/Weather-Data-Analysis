@@ -1,23 +1,16 @@
 import pandas
 
 def dynamic(cursorObject, day, monthNo):
-    queryList = []
-    response = []
-    tail = f''' from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo};'''
-    
-    queryList.append("select avg(`Maximum Temperature`)")
-    queryList.append("select avg(`Minimum Temperature`)")
-    queryList.append("select max(`Maximum Temperature`)")
-    queryList.append("select min(`Minimum Temperature`)")
-    queryList.append("select avg(`Precipitation`)")
-    queryList.append("select max(`Precipitation`)")
+    query=f'''select avg(`Maximum Temperature`), avg(`Minimum Temperature`),
+            max(`Maximum Temperature`), min(`Minimum Temperature`),
+            avg(`Precipitation`), max(`Precipitation`)
+            from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo};'''
 
-    for query in queryList:
-        cursorObject.execute(query+tail)
-        response.append(round(cursorObject.fetchall()[0][0],2))
+    cursorObject.execute(query)
+    df = pandas.DataFrame(cursorObject.fetchall()[0], columns=[''],
+                index= ['Average Max Temp', 'Average Min Temp', 'Max Recorded Temp', 'Min Recorded Temp', 'Average Rainfall', 'Max Rainfall'])
+    return df
 
-    response = pandas.DataFrame(response, columns=[''], index= ['Average Max Temp', 'Average Min Temp', 'Max Recorded Temp', 'Min Recorded Temp', 'Average Rainfall', 'Max Rainfall'])#, 'Conditions Summary'])
-    return response
 
 def conditions_summary(cursorObject, day, monthNo):
     df= pandas.DataFrame(index=[''])
