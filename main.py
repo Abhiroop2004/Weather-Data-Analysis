@@ -23,7 +23,7 @@ if (hour >= 18 or hour < 6):
     edit_background(file_path=".streamlit\config.toml", bg="#102b61", secondary_bg="#061024", text="ffffff")
     emoji = "🌃"
 else:
-    edit_background(file_path=".streamlit\config.toml", bg="#e8cd1e", secondary_bg="#e0ce55", text="#141414")
+    edit_background(file_path=".streamlit\config.toml", bg="#e8af1e", secondary_bg="#c9a444", text="#141414")
     emoji = "🌅"
 
 def main():
@@ -54,13 +54,11 @@ def show_info():
     st.write("- ### [Abhiroop's LinkedIn](https://linkedin.com/in/abhiroop2004)")
     st.write("- ### [Snehal's LinkedIn](https://www.linkedin.com/in/snehal-ghosh-164a63263)")
     st.write()
-    st.write('''Project developed under the guidance of Professor Doctor DeepShubhra Guha Roy
-             for the Database Management Systems Laboratory
+    st.write('''Project developed under the guidance of **Prof. Dr. Deepshubhra Guha Roy**
+             for the **Database Management Systems Laboratory**
              being taught by the department of Computer Science and Engineering
              (Artificial Intelligence and Machine Learning) along with 
-             Computer Science and Business Studies headed by 
-             Professor Amartya Mukherjee at the
+             Computer Science and Business Studies,
              Institute of Engineering and Management SaltLake''')
-
 if __name__ == "__main__":
     main()
