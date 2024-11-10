@@ -14,7 +14,7 @@ def edit_background(file_path, bg, secondary_bg, text):
 
     print("Background color updated successfully!")
 
-cnx = mysql.connector.connect(user ='root', password='12345678', host='localhost', database='kolkata_weather')
+cnx = mysql.connector.connect(user ='root', password='12345', host='localhost', database='kolkata_weather')
 cursor = cnx.cursor()
 current_time = datetime.now()
 hour = current_time.hour
@@ -42,17 +42,12 @@ def show_home():
     st.write("### Climate data for Kolkata from 2017 to 2022")
     table = Q.static_table(cursor)
     st.table(data = table.T.style.format("{:.2f}"))
-    table2 = Q.dynamic(cursor, day=current_time.day, monthNo = current_time.month)
-    st.write(f"### Historic Data for {current_time.date().strftime('%d %B')}")
     column1, column2 = st.columns(2)
-    #table2 = table2.T.rename(columns = {'0':'Values'}, inplace=True)
-    # table3 = table2.rename(columns = {'':'Values'})
-    #table3.index.name = ['Info']
     with column1:
-        st.dataframe(table2)
-    # st.table(data = table3.style.format("{:.2f}"))
-    with column2:
+        st.write(f"### Historic Data for {current_time.date().strftime('%d %B')}")
         st.dataframe(Q.conditions_summary(cursor, current_time.day, monthNo = current_time.month).T)
+    with column2:
+        st.dataframe(Q.dynamic(cursor, day=current_time.day, monthNo = current_time.month))
 
 def show_info():
     st.write("# Info")
