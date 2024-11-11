@@ -14,7 +14,7 @@ def edit_background(file_path, bg, secondary_bg, text):
 
     print("Background color updated successfully!")
 
-cnx = mysql.connector.connect(user ='root', password='12345', host='localhost', database='kolkata_weather')
+cnx = mysql.connector.connect(user ='root', password=' ', host='localhost', database='kolkata_weather')
 cursor = cnx.cursor()
 current_time = datetime.now()
 hour = current_time.hour
