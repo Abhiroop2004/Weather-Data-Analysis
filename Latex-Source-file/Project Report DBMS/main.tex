@@ -1,0 +1,363 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{listings}
+%\title{Project Report DBMS}
+%\author{Abhiroop Sarkar}
+%\date{November 2024}
+%\documentclass[11pt, a4paper]{report}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{cite}
+%\usepackage{biblatex}
+%\usepackage{}
+%\usepackage[dvipdfmx]{graphicx}
+\usepackage{epsfig}
+%\usepackage{array} 
+\usepackage{url}
+%\usepackage{bmpsize}
+\usepackage{tocbibind}
+\renewcommand{\baselinestretch}{1.5} 
+\begin{document}
+%\maketitle
+\begin{center}
+\rule{\linewidth}{0.5pt} \\
+ \vspace{0.6cm}
+\textbf{\huge Weather Data Analysis} \\
+ \vspace{0.2cm}
+\rule{\linewidth}{0.5pt} \\	
+ \vspace{-.5cm}
+\begin{figure}[h]
+\centering
+    \includegraphics[width=.5\textwidth]{iem.png}
+\end{figure}
+\vspace{-.5cm}
+\LARGE Database Management System Laboratory\\
+\vspace{0.3cm}
+\LARGE Project Report \\
+\vspace{0.2cm}
+\Large Submitted by \\
+\large
+    Abhiroop Sarkar (12022002016041) \\
+    Snehal Ghosh (12022002016037)\\
+    Under the guidance and supervision of\\
+    Prof. Dr. Deepsubhra Guha Roy
+%     Abhiroop Sarkar & 12022002016041 \\
+%     Snehal Ghosh & 120220020160 \\
+%    \textit{\textbf{Instructor}:} & Prof. Dr. Deepsubhra Guha Roy\\
+%\end{tabular}
+\vspace{1cm}
+\large Submitted to the \\ Department of Computer Science and Engineering (Artificial Intelligence and Machine Learning and Computer Science and Business Systems)
+\textbf{\large Institute of Engineering \& Management, Kolkata \\ \vspace{0.3cm} }
+%\vspace{0.1cm}
+\vspace{1cm}
+%\vspace{1cm}
+\date{}
+\end{center}
+\newpage
+\section*{Acknowledgment}
+As students from 5th semester of the Department of Computer Science and Engineering (Artificial Intelligence and Machine Learning) at the Institute of Engineering and Management, we submit this project for the Database Management Systems Laboratory, PCCCS501(Lab). \\
+We would like to thank our mentor Prof. Dr. Deepshubhra Guha Roy for his support and guidance provided throughout this project.
+\newpage
+
+\tableofcontents
+\newpage
+\section{Introduction}
+\subsection{Problem Statement and Anlysis}
+The analysis of historical weather data is an important component of climate science, which provides insights into the past atmospheric conditions enabling us for a deeper understanding of climate change and variations. With the rise of global warming and climate change, the need for accurate and comprehensive weather records has never been more pressing. Historical weather data can encompasses a lot lot of variables, like temperature, precipitation, humidity, wind speed, and direction, collected over long periods. This data can serve as a critical resource for researchers to validate climate models, forecast weather, and assess the impacts of human activity on weather patterns.\\
+There has been many advancements in data collection and analysis, which has enhanced our ability to store and utilize weather data effectively. An example of a historical weather database is HCILM \cite{Lundstad2023-ky}, which has integrated numerous instrumental records from various sources dating back to the pre-1890 era, providing us with a wealth of information for climate reconstruction. 
+The significance of historical weather data extends beyond the borders of academic research. It plays crucial roles in practical applications across various sectors. For example, agriculture and renewable energy industries rely on this data to make informed decisions about crop management and energy production based on anticipated weather conditions 2. Apart from that, understanding historical weather patterns allows scientists to track changes in climate systems and accurately 
+predict future scenarios. In the early days, fetching current weather data involved people relying on data from nearby weather stations, but technological advancements like API (Application Programming Interfaces) help make weather data more easily available for researchers and industry \cite{weatherstackLeveragingHistorical}. 
+\subsection{Objective}
+The primary objectives of our project involve the analysis of past weather data of our city, Kolkata, and presenting it in tabular and pictorial format, which enables the residents and visitors of Kolkata to find a short summary of the climate of the city along with a summary of how the weather has previously been on the present date in the previous year, providing a likely estimate of how the weather of the day is going to turn out that day. We have primarily used MySQL as the database to fetch information regarding the weather, Python with MySQL Connector for the backend operations, and Streamlit module for our frontend design. We have fetched our dataset from Kaggle, which contains weather data of Kolkata \cite{kaggleWeather_data_of_Kolkata} from the year 2017 to 2021. It is openly available at {https://www.kaggle.com/datasets/kafkarps/five-years-weather-data-of-kolkata}.
+\newpage
+\section{Literature Review}
+In our literature review, we highlight some of the important models used in weather analysis, including traditional statistical methods, machine learning, and deep learning approaches.
+\begin{enumerate}
+    \item \textbf{Statistical Methods}
+        \subitem ARIMA Models\\
+        Autoregressive-integrated-moving-average (ARIMA) and seasonal ARIMA (SARIMA) models are generalized versions of the ARMA model for non-stationary and periodic time-series data. These generalizations so that seasonal variations in data can be observed. ARMA assumes the time series data to be stationary, if there is a constant variance or trend, it is removed through the process of differencing, corresponding to the I (integrated) part of ARIMA, while periodic variation is removed by seasonal differencing, corresponding to the S (seasonal) part of SARIMA. Further generalization was performed which allows external variables that may affect the time series to be included known as Exogenous Regressors, corresponding to X in SARIMAX. \cite{wikipediaAutoregressiveIntegrated, geeksforgeeksCompleteGuide}
+    \item \textbf{Machine Learning Methods}\\
+        Recent Studies have shown that machine learning models such as Linear Regression, Decision Tree Regressors, and Support Vector Regressors, allow us to utilize weather features such as rain, snow, humidity, and wind to enhance forecasting. Machine learning methods for climate prediction have been evolving since the 1990s. During the early 2000s, the field incorporated machine learning-enhanced models for medium or long-term weather prediction that have been utilized \cite{app132112019}. Examples include Support Vector Machine (SVM)-downscaling and K-Nearest Neighbor (KNN)-downscaling which applied the respective models for regional forecasting. Machine learning models are usually used in bias correction, downscaling, and emulation. They are also used with statistical methods as hybrid models, to refine predictions of statistical and numerical models for accurate predictions.
+    \item \textbf{Deep Learning Methods}\\
+        Deep learning models have significantly advanced climate prediction by offering robust architectures for various temporal and spatial scales. In 1998, early methods like Precipitation Neural Networks used artificial neural networks for short-term forecasting. In 2015, hybrid deep learning models like ConvLSTM combined CNNs and LSTMs for precipitation forecasting \cite{app132112019}. Google's MetNet \cite{metnet} introduced in 2020, uses neural networks and is tailored specifically for precipitation forecasting, up to 8 hours in the future and was shown to outperform Numerical Weather Prediction at that time interval, by taking radar data, satellite data, and time to forecast ahead as input parameters.
+\end{enumerate}
+\subsection{Types of Weather Forecasting}
+\begin{enumerate}
+    \item \textbf{Long-Term} \\
+    Long-term weather forecasting typically refers to predictions that are made for periods extending beyond two weeks, often ranging from 30 days to several months or even years. This type of forecasting is less focused on specific daily weather events and more on general trends and anomalies over extended periods.
+    This type of forecasting is vital for the agriculture sector, disaster prediction, and energy management, where long-term forecasts can help us understand seasonal trends and help us make strategic decisions.
+    \item \textbf{Short-Term}\\
+    Short-term weather forecasting focuses on predicting atmospheric conditions from a few hours up to a week ahead. This is the type of forecasting we usually see in our weather applications and websites, and at present are quite accurate.
+    Thus, Short-term forecasts are essential for everyday activities, like travel planning, event scheduling, and emergency response during severe weather events. They provide us with critical information that helps individuals and organizations make informed decisions on the go.
+\end{enumerate}
+\newpage
+\section{System Description}
+\subsection{Dataset} 
+Our dataset, sourced from Kaggle \cite{kaggleWeather_data_of_Kolkata} consists of multiple weather parameters and location data as features, including:
+    \begin{enumerate}
+    \item Address: Kolkata, West Bengal, India
+    \item Date time 
+    \item Minimum Temperature: Daily Minimum
+    \item Maximum Temperature: Daily Minimum
+    \item Temperature: Average Temperature
+    \item Dew Point
+    \item Relative Humidity
+    \item Heat Index
+    \item Wind Speed
+    \item Wind Gust
+    \item Wind Direction
+    \item Wind Chill
+    \item Precipitation: Daily Rainfall
+    \item Precipitation Cover
+    \item Snow Depth
+    \item Visibility
+    \item Cloud Cover
+    \item Sea Level Pressure
+    \item Weather Type : Like Clear, 
+    \item Latitude
+    \item Longitude
+    \item Resolved Address
+    \item Name
+    \item Info
+    \item Conditions
+    \end{enumerate}
+    It is presented as a time series of data starting from $1^{st}$ January 2017, upto $31^{st}$ December 2022. \\
+    During preprocessing we used the $pandas$ library of Python to remove the columns Name, Address, Resolved Address, Wind Gust, Wind Chill, Info, Snow Depth, as they were either unnecessary or contained too many NULL values, and therefore better not to include in the database. After that, we converted the dataframe to SQL and pushed it to local MySQL of our system using the $to\_sql()$ function of pandas and $create\_engine()$ function of $sqlalchemy$ package.
+\subsection{Database Management System }
+    We use MySQL as the primary database management system in our project. We have written Python Code which is being executed, to query the database to fetch the information that is displayed in the website. Python has been connected to MySQL using the $mysql.connector$ available as a module in Python's $mysql$ library. MySQL is an open-source relational database management system (RDBMS) which is named after its co-founder Michael Widenius's daughter, "My," combined with "SQL," short for Structured Query Language. It organizes data into related tables, and allows structured storage and easy data retrieval using SQL. MySQL also manages users, enables network access, and supports database integrity and backup testing. It is available as free software under the GNU General Public License, and also offers proprietary licenses \cite{wikipediaMySQLWikipedia}.
+\subsection{Back-end} 
+    We use Python as the backend for this project. Python libraries such as $mysql.connector$, $pandas$, and $datetime$ has been extensively utilized as tools to achieve our purpose. $mysql.connector$ has been used to connect our Python backend to MySQL database, $pandas$ has been used to store and manipulate data in the form of tables, and $datetime$ has been used to fetch the current date and time for dynamic features of our web application.
+\subsection{Front-end}
+    We have used the $Streamlit$ framework provided by Python for our front-end. It provides simple, easy-to-use, and clean-looking websites for building webpages using Python only. It also includes support for custom colors using the $toml$ file, which we have utilized, and functions to display data in tables. This framework is primarily used for hosting websites for machine learning and data science projects that use Python.
+    
+\newpage
+\section{Methodology}
+\subsection{File Structure}
+\begin{itemize}
+    \item {.streamlit}
+        \subitem \texttt{config.toml}
+    \item \texttt{Kolkata\_weather\_data(2017-2022).csv}
+    \item \texttt{Kolkata\_weather\_data(2017-2022)\_processed.csv}
+    \item \texttt{Queries.py}
+    \item \texttt{main.py}
+\end{itemize}
+\newpage
+\section{Implementation}
+\begin{lstlisting}[language=Python, breaklines=true]
+def dynamic(cursorObject, day, monthNo):
+    query=f'''select avg(`Maximum Temperature`), avg(`Minimum Temperature`),
+            max(`Maximum Temperature`), min(`Minimum Temperature`),
+            avg(`Precipitation`), max(`Precipitation`)
+            from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo};'''
+
+    cursorObject.execute(query)
+    df = pandas.DataFrame(cursorObject.fetchall()[0], columns=[''],
+                index= ['Average Max Temp', 'Average Min Temp', 'Max Recorded Temp', 'Min Recorded Temp', 'Average Rainfall', 'Max Rainfall'])
+    return df
+\end{lstlisting}
+.\\
+
+The Dynamic Function helps us to estimate the expected maximum and minimum temperatures for that day of the month across the last 6 years. It also highlights the maximum and minimum recorded temperature for that day of the month. To highlight how wet the day may be, we also give the average and maximum rainfall for that day of month in the last 6 years.\\
+
+The query is executed and the response is stores into a dataframe with appropriate row labels. The default column label is removed and the dataframe is then returned to the calling function\\
+
+The function takes the mySQL cursor object pointer along with the day \& month numbers as input
+\newpage
+\begin{lstlisting}[language=Python, breaklines=true]
+def conditions_summary(cursorObject, day, monthNo):
+    df= pandas.DataFrame(index=[''])
+
+    query = f'''select Conditions, count(Conditions) from weather where Day(`Date time`)={day} and Month(`Date Time`)={monthNo} group by Conditions'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+
+    for condition in ['Clear', 'Partially cloudy', 'Rain', 'Overcast']:
+        sum =0
+        for label in response:
+            if condition in label[0]:
+                sum+= label[1]
+        if sum:
+            df[condition] = [f"{sum} out of last 6 years "]
+        
+    return df
+\end{lstlisting}
+.\\
+
+This function takes the mySQL cursor object pointer along with the day \& month numbers as input.\\
+
+It first initialises and empty dataframe. It then queries the database for the count of each weather condition for that particular day of the month, and fetches the response\\
+
+It then iterates over a pre-determined list of conditions and searches for it in each of the response items. If a match is found, it adds it to the count for that condition. At last, for each condition, if the count is found to be greater than 0, it is added as a new column in the dataframe.\\
+
+Finally it returns the dataframe
+\newpage
+\begin{lstlisting}[language=Python, breaklines=true]
+def static_table(cursorObject):
+    dataframe = pandas.DataFrame(index= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Year'])
+
+    query = '''select min(`Minimum Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(min(response))
+    dataframe['Min. Recorded Temperature'] =response
+
+    query = '''select avg(`Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response)/len(response))
+    dataframe['Average Temperature'] =response
+
+    query = '''select max(`Maximum Temperature`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(max(response))
+    dataframe['Max. Recorded Temperature'] =response
+
+    query = '''select sum(`Precipitation`)/6 from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response))
+    dataframe['Average Rainfall'] =response
+
+    query = '''select count(*)/6 from weather where Precipitation>0 group by Month(`Date time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [float(temp[0]) for temp in response]
+    response.append(sum(response))
+    dataframe['Average Rainy Days'] =response
+
+    query = '''select avg(`Relative Humidity`) from weather group by month(`Date Time`);'''
+    cursorObject.execute(query)
+    response = cursorObject.fetchall()
+    response = [temp[0] for temp in response]
+    response.append(sum(response)/len(response))
+    dataframe['Average Rel. Humidity'] =response
+
+    return dataframe
+\end{lstlisting}
+
+The static function takes just the mySQL cursorObject as an argument.\\
+
+It first initialises a DataFrame with the names of the months and year as the index. This dataframe is supposed to be flipped(transposed) before being displayed to the public, making these labels - column headers.\\
+
+Then it executes the queries which applies an aggregate function on a metric, after grouping them by months. We then run a loop to extract the first object in each tuple of the response. It then applies the aggregate function on this response and append it to the response list. Then the response list is added as a column to the dataframe\\
+
+At the end, the function returns the dataframe, which is to be transposed before displaying
+
+\newpage
+.\\
+
+\begin{lstlisting}[language=Python, breaklines=true]
+import mysql.connector, pandas, toml
+import streamlit as st
+from datetime import datetime
+import Queries as Q
+\end{lstlisting}
+.\\
+
+The first 4 lines of our main python file imports the neccessary libraries.\\
+
+The 'connector' attribute of the 'mysql' library is used to connect our python files to the mysql service running on the backend server\\
+
+The 'pandas' library is used for Dataframes\\
+
+The 'toml' library is neccessary for configuring the streamlit site\\
+
+The 'streamlit' library is imported as 'st' alias to display our application as a web portal\\
+
+The 'datetime' attribute of the package of the same name, has the defines the behaviour of dates and time, along with the current date-time and the associated functions\\
+
+At last the Queries.py file is imported, which has the functions containing our queries
+\newpage
+\begin{lstlisting}[language=Python, breaklines=true]
+def edit_background(file_path, bg, secondary_bg, text):
+    with open(file_path, 'r') as file:
+        config = toml.load(file)
+    config['theme']['backgroundColor'] = bg
+    config['theme']['secondaryBackgroundColor'] = secondary_bg
+    config['theme']['textColor'] = text
+    with open(file_path, 'w') as file:
+        toml.dump(config, file)
+
+    print("Background color updated successfully!")
+
+cnx = mysql.connector.connect(user ='root', password='12345', host='localhost', database='kolkata_weather')
+cursor = cnx.cursor()
+current_time = datetime.now()
+hour = current_time.hour
+emoji = ""
+if (hour >= 18 or hour < 6):
+    edit_background(file_path=".streamlit\config.toml", bg="#102b61", secondary_bg="#061024", text="ffffff")
+    emoji = ""
+else:
+    edit_background(file_path=".streamlit\config.toml", bg="#e8af1e", secondary_bg="#c9a444", text="#141414")
+    emoji = ""
+\end{lstlisting}
+We first connect to the server's mySQL database as the root user with the appropriate password and switch to the correct database\\
+
+We then obtain the cursor object of the connection with the cursor function\\
+
+We then check the current time. During the daytime (in Kolkata), the site operates in light mode, while it switches to night mode after sunset. The text and background colors of the site are changed accordingly.
+\newpage
+\begin{lstlisting}[language=Python, breaklines=true]
+def main():
+    st.set_page_config(layout="wide")
+    st.title(f"Weather Data Analysis{emoji}")    
+    # print(current_time.date)
+    navigation_options = ["Home", "Info"]
+    menu_selection = st.selectbox("",navigation_options)
+    
+    if menu_selection == "Home":
+        show_home()
+    elif menu_selection == "Info":
+        show_info()
+\end{lstlisting}
+.\\
+The main function configures the page to be wide by default. It requests to transfer to other pages\\
+
+.\\
+
+\begin{lstlisting}[language=Python, breaklines=true]
+def show_home():
+    st.write("### Climate data for Kolkata from 2017 to 2022")
+    table = Q.static_table(cursor)
+    st.table(data = table.T.style.format("{:.2f}"))
+    column1, column2 = st.columns(2)
+    with column1:
+        st.write(f"### Historic Data for {current_time.date().strftime('%d %B')}")
+        st.dataframe(Q.conditions_summary(cursor, current_time.day, monthNo = current_time.month).T)
+    with column2:
+        st.dataframe(Q.dynamic(cursor, day=current_time.day, monthNo = current_time.month))
+\end{lstlisting}
+.\\
+The Home Page calls the Query functions and displays the dataframes. It also has to flip the first dataframe and rounds off the float values to 2 decimal places
+\newpage
+.\\
+
+\begin{lstlisting}[language=Python, breaklines=true]
+def show_info():
+    st.write("# Info")
+    st.write("- ### [Abhiroop's LinkedIn](https://linkedin.com/in/abhiroop2004)")
+    st.write("- ### [Snehal's LinkedIn](https://www.linkedin.com/in/snehal-ghosh-164a63263)")
+    st.write()
+    st.write('''Project developed under the guidance of **Prof. Dr. Deepshubhra Guha Roy**
+             for the **Database Management Systems Laboratory**
+             being taught by the department of Computer Science and Engineering
+             (Artificial Intelligence and Machine Learning) along with 
+             Computer Science and Business Studies,
+             Institute of Engineering and Management SaltLake''')
+\end{lstlisting}
+.\\
+
+The Info Page displays the links to the LinkedIn account of the project developers, along with an acknowledgement to the department 
+\newpage
+\section{Conclusion}
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{ref.bib}
+
+\end{document}
